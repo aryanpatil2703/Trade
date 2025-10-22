@@ -1,0 +1,36 @@
+{
+  "name": "real-world-data-marketplace",
+  "version": "1.0.0",
+  "description": "Full-stack monorepo for Real-World Data Marketplace for AI Agents",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "hardhat"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:frontend && npm run install:backend && npm run install:hardhat",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:hardhat": "cd hardhat && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "compile": "cd hardhat && npx hardhat compile",
+    "deploy:local": "cd hardhat && npx hardhat run scripts/deploy.ts --network localhost",
+    "deploy:mumbai": "cd hardhat && npx hardhat run scripts/deploy.ts --network mumbai",
+    "test": "cd hardhat && npx hardhat test",
+    "lint": "cd frontend && npm run lint",
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
