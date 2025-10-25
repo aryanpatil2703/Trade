@@ -12,7 +12,7 @@ This project implements a complete data marketplace ecosystem with the following
 - **DataCoins**: 1MB.io integration for DataCoin tokenization
 - **Explorer**: Blockscout Autoscout instance for transaction verification
 - **Agents**: Fetch.ai agents for discovery, negotiation, and validation
-- **Knowledge Graph**: MeTTa for strctured storage
+- **Knowledge Graph**: MeTTa for strctured metadata storage
 
 ## 🚀 Quick Start
 
