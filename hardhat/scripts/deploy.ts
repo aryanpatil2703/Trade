@@ -14,6 +14,7 @@ async function main() {
   const dataCoin = await DataCoin.deploy();
   await dataCoin.waitForDeployment();
   
+  
   const dataCoinAddress = await dataCoin.getAddress();
   console.log("✅ DataCoin deployed to:", dataCoinAddress);
 
