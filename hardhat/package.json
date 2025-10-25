@@ -7,7 +7,9 @@
     "test": "hardhat test",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
-    "verify": "hardhat run scripts/verify.ts --network mumbai"
+    "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
+    "verify": "hardhat run scripts/verify.ts --network mumbai",
+    "verify:amoy": "hardhat run scripts/verify.ts --network amoy"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.0",

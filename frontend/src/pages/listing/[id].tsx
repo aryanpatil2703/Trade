@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 import WalletConnect from '../../components/WalletConnect';
+import SimpleNetworkSwitcher from '../../components/SimpleNetworkSwitcher';
 import ExplorerCard from '../../components/ExplorerCard';
+import { purchaseToken, ethToWei } from '../../lib/marketplace';
+import { debugLog, checkBackendHealth, checkWalletConnection, validatePurchaseRequest } from '../../lib/debug';
 
 // Mock data for demo
 const mockListing = {
@@ -35,10 +39,13 @@ const mockListing = {
 export default function ListingPage() {
   const router = useRouter();
   const { id } = router.query;
+  const { address, isConnected } = useAccount();
   const [listing, setListing] = useState(mockListing);
   const [loading, setLoading] = useState(false);
+  const [buying, setBuying] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
   const [provenanceData, setProvenanceData] = useState(null);
+  const [purchaseResult, setPurchaseResult] = useState(null);
 
   useEffect(() => {
     if (id) {
@@ -86,8 +93,64 @@ export default function ListingPage() {
   };
 
   const handleBuy = async () => {
-    // In production, this would trigger the actual purchase transaction
-    alert('Purchase functionality would be implemented here with wallet integration');
+    debugLog('Buy button clicked', { isConnected, address, listing });
+    
+    // Check wallet connection
+    if (!checkWalletConnection(address, isConnected)) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    // Validate purchase request
+    const validation = validatePurchaseRequest(listing.id, listing.price);
+    if (!validation.valid) {
+      alert(`Invalid purchase request: ${validation.error}`);
+      return;
+    }
+
+    // Check backend health
+    const backendHealthy = await checkBackendHealth();
+    if (!backendHealthy) {
+      alert('Backend service is not available. Please make sure the backend is running on port 3001.');
+      return;
+    }
+
+    setBuying(true);
+    setPurchaseResult(null);
+
+    try {
+      // Convert ETH price to wei
+      const priceInWei = ethToWei(listing.price);
+      debugLog('Purchase request', { tokenId: listing.id, priceInWei });
+      
+      const response = await purchaseToken({
+        tokenId: listing.id,
+        value: priceInWei
+      });
+
+      debugLog('Purchase response', response);
+
+      setPurchaseResult({
+        success: true,
+        transactionHash: response.transactionHash,
+        explorerUrl: response.explorerUrl,
+        message: response.message
+      });
+      
+      // Show success message
+      alert(`Purchase successful! Transaction: ${response.transactionHash}`);
+    } catch (error) {
+      console.error('Purchase error:', error);
+      debugLog('Purchase error', error);
+      
+      setPurchaseResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Purchase failed'
+      });
+      alert(`Purchase failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setBuying(false);
+    }
   };
 
   const handleDownloadSample = async () => {
@@ -121,7 +184,10 @@ export default function ListingPage() {
               <Link href="/" className="text-2xl font-bold text-gray-900">
                 DataCoin Marketplace
               </Link>
-              <WalletConnect />
+              <div className="flex items-center space-x-4">
+                <SimpleNetworkSwitcher />
+                <WalletConnect />
+              </div>
             </div>
           </div>
         </header>
@@ -205,9 +271,10 @@ export default function ListingPage() {
                   </button>
                   <button
                     onClick={handleBuy}
-                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                    disabled={buying || !isConnected}
+                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    💰 Buy Dataset
+                    {buying ? 'Processing...' : isConnected ? '💰 Buy Dataset' : '🔗 Connect Wallet First'}
                   </button>
                   <button
                     onClick={handleDownloadSample}
@@ -217,6 +284,45 @@ export default function ListingPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Purchase Result Section */}
+              {purchaseResult && (
+                <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-semibold mb-4">
+                    {purchaseResult.success ? '✅ Purchase Successful' : '❌ Purchase Failed'}
+                  </h3>
+                  
+                  {purchaseResult.success ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Transaction Hash:</span>
+                        <span className="font-mono text-sm">{purchaseResult.transactionHash}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Status:</span>
+                        <span className="text-green-600 font-semibold">Confirmed</span>
+                      </div>
+                      <div className="mt-4">
+                        <a
+                          href={purchaseResult.explorerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                        >
+                          <span className="mr-1">🔍</span>
+                          View on Explorer
+                          <span className="ml-1">→</span>
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-red-600">
+                      <p className="font-semibold">Error:</p>
+                      <p className="text-sm">{purchaseResult.error}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Provenance Section */}
               {showProvenance && provenanceData && (

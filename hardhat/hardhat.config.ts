@@ -18,9 +18,16 @@ const config: HardhatUserConfig = {
       chainId: 31337,
     },
     mumbai: {
-      url: process.env.RPC_URL_MUMBAI || "",
+      url: process.env.RPC_URL_MUMBAI || "https://polygon-mumbai.g.alchemy.com/v2/demo",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 80001,
+      gasPrice: "auto",
+    },
+    amoy: {
+      url: process.env.RPC_URL_AMOY || "https://rpc-amoy.polygon.technology",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 80002,
+      gasPrice: "auto",
     },
   },
   paths: {

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import WalletConnect from '../components/WalletConnect';
+import NetworkSwitcher from '../components/NetworkSwitcher';
+import SimpleNetworkSwitcher from '../components/SimpleNetworkSwitcher';
 import ListingCard from '../components/ListingCard';
 
 // Mock data for demo
@@ -71,6 +73,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="flex items-center space-x-4">
+                <SimpleNetworkSwitcher />
                 <WalletConnect />
                 <Link 
                   href="/chat"
