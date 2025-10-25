@@ -19,7 +19,17 @@ const mockListings = [
     format: 'Images',
     verified: true
   },
-
+  {
+    id: 2,
+    name: 'Financial Market Data',
+    description: 'Historical stock prices and trading data',
+    price: '0.05',
+    cid: 'QmSampleFinancialData456',
+    category: 'Finance',
+    size: '850MB',
+    format: 'CSV',
+    verified: true
+  },
   {
     id: 3,
     name: 'Natural Language Corpus',
