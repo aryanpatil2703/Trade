@@ -4,6 +4,12 @@ import { ethers } from 'ethers';
 import DataCoinABI from './contracts/DataCoin.json';
 import MarketplaceABI from './contracts/Marketplace.json';
 
+export interface ContractConfig {
+  dataCoinAddress: string;
+  marketplaceAddress: string;
+  chainId: number;
+  rpcUrl: string;
+}
 
 export class ContractManager {
   private provider: ethers.JsonRpcProvider;
