@@ -20,7 +20,7 @@ This project implements a complete data marketplace ecosystem with the following
 
 - Node.js 18+
 - npm or yarn
-- Git
+
 
 ### Installation
 
